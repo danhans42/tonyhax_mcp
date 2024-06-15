@@ -363,8 +363,10 @@ void main() {
 	}
 
 	//gameid stuff
-	if (mcpro_check(MCPRO_PORT_0)==0) debug_write("MCPRO/SD2PSX detected in port 0");
-	if (mcpro_check(MCPRO_PORT_1)==0) debug_write("MCPRO/SD2PSX detected in port 1");
+	if (mcpro_check(MCPRO_PORT_0)==0) {
+		mcpro_sendid("");
+		debug_write("MCPRO/SD2PSX detected in port 0");
+	}
 
 	bios_inject_disc_error();
 	log_bios_version();
