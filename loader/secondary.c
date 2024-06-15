@@ -13,9 +13,24 @@
 #include "patcher.h"
 #include "integrity.h"
 #include "io.h"
+#include "memcardpro.h"
+
 
 // Loading address of tonyhax, provided by the secondary.ld linker script
 extern uint8_t __RO_START__, __BSS_START__, __BSS_END__;
+
+
+uint8_t mcpro_check(uint8_t port){
+
+	return MemCardPro_Ping(port);
+}
+
+uint8_t mcpro_sendid(char *gameid)
+{
+    return  MemCardPro_SendGameID(MCPRO_PORT_0, strlen(gameid), gameid);
+}
+
+
 
 void log_bios_version() {
 	/*
@@ -240,7 +255,9 @@ void try_boot_cd() {
 	debug_write(" * %s = %x", "EVENT", event);
 	debug_write(" * %s = %x", "STACK", stacktop);
 	debug_write(" * %s = %s", "BOOT", bootfile);
-
+	
+	mcpro_sendid(bootfile);
+	
 	/*
 	 * SetConf is run by BIOS with interrupts disabled.
 	 *
@@ -328,6 +345,8 @@ void try_boot_cd() {
 	DoExecute(exe_header, 0, 0);
 }
 
+
+
 void main() {
 	// Undo all possible fuckeries during exploiting
 	bios_reinitialize();
@@ -342,6 +361,10 @@ void main() {
 	if (!integrity_ok) {
 		return;
 	}
+
+	//gameid stuff
+	if (mcpro_check(MCPRO_PORT_0)==0) debug_write("MCPRO/SD2PSX detected in port 0");
+	if (mcpro_check(MCPRO_PORT_1)==0) debug_write("MCPRO/SD2PSX detected in port 1");
 
 	bios_inject_disc_error();
 	log_bios_version();

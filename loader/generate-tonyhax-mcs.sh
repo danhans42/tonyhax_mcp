@@ -17,7 +17,7 @@ ro_start=$(objdump -x "$elf_file" | grep __RO_START__ | cut -d ' ' -f 1)
 
 # Create temporary file for the binary
 bin_file=$(mktemp)
-mips-linux-gnu-objcopy -O binary  -j .text -j .rodata -j .data -j .crc "$elf_file" $bin_file
+mipsel-linux-gnu-objcopy -O binary  -j .text -j .rodata -j .data -j .crc "$elf_file" $bin_file
 
 # Round filesize to nearest 128-byte block
 truncate --size=%128 $bin_file
